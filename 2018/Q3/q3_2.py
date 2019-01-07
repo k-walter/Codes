@@ -36,7 +36,7 @@ class Claim():
 # Initialise fabric
 fab = np.zeros((1000,1000),int)
 # fab = np.zeros((8,8),int)
-coords = {} # dict to tag claim to coordinates
+claims = set(range(1,len(r)+1))
 
 for a in r:
 	# Parse input
@@ -50,27 +50,16 @@ for a in r:
 	# print(claim.start.y,claim.end.y)
 
 	# Add to fabric
-	overlap = False
 	for y in range(claim.start.y, claim.end.y):
 		for x in range(claim.start.x, claim.end.x):
-			fab[y,x] += 1
+			# If previously occupied
+			if fab[y,x] > 0:
+				claims.discard(claim.no)
+				claims.discard(fab[y,x])
 
-			# Tag claim numbers to their coordinate
-			if fab[y,x] > 1:
-				coords[y,x].append(claim.no)
-			else:
-				coords[y,x] = [claim.no]
-
-# Coordinates of overlaps
-overlaps = np.nonzero(fab>1)
-
-# Remove overlaps
-claims = set(range(1,len(r)+1))
-for a in range(len(overlaps[0])):
-	y = overlaps[0][a]
-	x = overlaps[1][a]
-	for b in coords[ (y,x) ]:
-		claims.discard(b)
+			# Occupy with claim no, which is >0
+			# This helps in the first instance of overlap
+			fab[y,x] = claim.no
 
 # Non-overlap(s)
 print(claims)
