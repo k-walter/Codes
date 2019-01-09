@@ -1,9 +1,6 @@
 import numpy as np
-# from scipy.signal import fftconvolve
-# from scipy.ndimage import convolve
 import re
 
-# read the data using scipy
 # f = open("q12_test.in",'r')
 f = open("q12.in",'r')
 r = f.readlines()
@@ -21,8 +18,6 @@ GEN = 50000000000
 k = np.array([16,8,4,2,1],dtype=int)
 
 # Read initial state and instructions
-# Padding of [0]*40 for growth and calculate index
-# 40 = 20 generations * 2 growth/gen
 state = np.array(ch2int(r[0]), dtype=int)
 for a in r[2:]:
 	tmp = ch2int(a)

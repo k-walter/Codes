@@ -1,9 +1,6 @@
 import numpy as np
-# from scipy.signal import fftconvolve
-# from scipy.ndimage import convolve
 import re
 
-# read the data using scipy
 # f = open("q12_test.in",'r')
 f = open("q12.in",'r')
 r = f.readlines()
@@ -37,6 +34,6 @@ for a in range(GEN):
 	state = np.where(np.isin(gen, insts), 1, 0)
 	# print(state[37:-29])
 
-# Resovle index in terms of 0th position
+# Resolve index in terms of 0th position
 index = np.array(np.where(state==1)) - GEN*2
 print(index.sum())
