@@ -35,4 +35,4 @@ for p in posn:
 	x,y = p-min_axis
 	result[x,y]=1
 plt.plot(posn[:,:1],-posn[:,1:],'bo') # invert y because +ve y is downwards
-plt.show()
+plt.show() # collapse window size to see picture
