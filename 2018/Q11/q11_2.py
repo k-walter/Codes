@@ -31,13 +31,13 @@ for size in range(2,301):
 	frame = size + 1
 
 	# Find TopLeft, TopRight, BtmLeft, BtmRight
-# 	# Note: Kernel is inverted because maths, but doesn't matter
+# 	# Note: Kernel is inverted because maths, but it's the same inverted
 	kernel = np.zeros((size+1,size+1), dtype=int)
 	for x,y,z in mesh:
 		kernel[x,y] = z
 
 	# Find power using summed area table
-	org = size%2 # If even window size, shift origin
+	# FFT is fastest for 2-Dim arrays
 	power = fftconvolve(sat, kernel, mode='same') # 'same' strips FFT stuff
 
 	# Reduce erroneous border data
@@ -54,13 +54,14 @@ for size in range(2,301):
 
 	# Heuristics
 	# I'm guessing that all max don't go below 0
-	# Previously guessed that it only goes up then down, I was wrong.
+	# Previously guessed that it increases then decreases, I was wrong.
+	# For completion, I'm commenting it out
 	# print(size,power[home],home)
 	# if power[home] < 0:
 	# 	break
 
 # Largest filter size
 size = np.argmax(maxs) + 2 # size of filter, 2 because I started with size of 2
-print("Size",size,"Max",max(maxs))
+# print("Size",size,"Max",max(maxs))
 TopLeft = np.array(homes[size-2]) - (size-1)//2 # Even sizes are centered to the right
 print(TopLeft,size)
