@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.ndimage import convolve
+from scipy.signal import fftconvolve
 
 SERIAL = 7803
 # SERIAL = 42
@@ -38,7 +38,7 @@ for size in range(2,301):
 
 	# Find power using summed area table
 	org = size%2 # If even window size, shift origin
-	power = convolve(sat, kernel, mode='constant', origin=-org)
+	power = fftconvolve(sat, kernel, mode='same') # 'same' strips FFT stuff
 
 	# Reduce erroneous border data
 	border = size // 2
@@ -56,8 +56,8 @@ for size in range(2,301):
 	# I'm guessing that all max don't go below 0
 	# Previously guessed that it only goes up then down, I was wrong.
 	# print(size,power[home],home)
-	if power[home] < 0:
-		break
+	# if power[home] < 0:
+	# 	break
 
 # Largest filter size
 size = np.argmax(maxs) + 2 # size of filter, 2 because I started with size of 2
