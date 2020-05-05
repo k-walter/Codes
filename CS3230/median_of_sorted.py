@@ -1,3 +1,7 @@
+"""
+ 	You have an unsorted integer array A[1..n]. You also have a sorted integer array B[1..k] (k<n), where B[1]<B[2]<…<B[k]. For any 1i<k, let Si be the set { A[j] | B[i]A[j]<B[i+1] }. You need to compute the array C[1..k-1] where C[i] is the median of all integers in Si if Si is a non-empty set; otherwise set C[i]=0.  Can you propose an 𝑂(𝑛log𝑘) time algorithm to compute C[1..k-1]?
+"""
+
 import numpy as np
 
 n = 100
