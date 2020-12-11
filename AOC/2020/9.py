@@ -1,5 +1,5 @@
 from typing import List, Set, Deque
-from collections import defaultdict, deque
+from collections import deque
 
 
 class Solution:
@@ -54,7 +54,6 @@ class Solution:
         minNo: int = min(self.win)
         maxNo: int = max(self.win)
         return maxNo + minNo
-
 
     def pushWin(self, no):
         self.win.append(no)
