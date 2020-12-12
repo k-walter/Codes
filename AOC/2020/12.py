@@ -1,8 +1,5 @@
 from typing import List, Tuple
 
-E, S, W, N = range(4)
-dyx = ((0, 1), (1, 0), (0, -1), (-1, 0))
-
 
 class Solution:
     def __init__(self, fname: str):
@@ -16,107 +13,54 @@ class Solution:
         lines: List[str] = r.split()
         self.moves: List[Tuple[str, int]] = [(i[0], int(i[1:])) for i in lines]
 
-    def initDirection(self):
-        self.wy: int = -1
-        self.wx: int = 10
-        self.d: int = E
-
-    def rotateCWtoEast(self) -> int:
-        if self.d == E:
-            return 0
-        d: int = self.d
-        self.d = E
-        if d == S:
-            "3,1 --> -1,3"
-            self.wy, self.wx = -self.wx, self.wy
-            return 90
-        if d == W:
-            "1,-3 --> -1,3"
-            self.wy, self.wx = -self.wy, -self.wx
-            return 180
-        if d == N:
-            "-3,1 --> 1,3"
-            self.wy, self.wx = self.wx, -self.wy
-            return 270
-        raise Exception('Direction not found')
-
-    def rotateCWfromEast(self):
-        assert 0 <= self.d < 4
-        if self.d == E:
-            return
-        if self.d == S:
-            "3,1 <-- -1,3"
-            self.wy, self.wx = self.wx, -self.wy
-        elif self.d == W:
-            "1,-3 <-- -1,3"
-            self.wy, self.wx = -self.wy, -self.wx
-        elif self.d == N:
-            "-3,1 <-- 1,3"
-            self.wy, self.wx = -self.wx, self.wy
-
-    def shipNWaypt(self):
-        y: int = 0
-        x: int = 0
-        dy: int
-        dx: int
-        self.initDirection()
+    def shipNWaypt(self) -> int:
+        pos: complex = 0 + 0j
+        wpt: complex = 10 - 1j
         for ch, amt in self.moves:
-            if ch in {'R', 'L'}:
-                isCW: int = 1 if 'R' else -1
-                adjAmt: int = amt + self.rotateCWtoEast() * isCW
-                self.rotateDir(ch, adjAmt)
-                self.rotateCWfromEast()
+            mv: complex = self.move(ch, amt)
+            if ch == 'F':
+                pos += mv * wpt
             elif ch in {'N', 'E', 'W', 'S'}:
-                dy, dx = self.move(ch, amt)
-                self.wy += dy
-                self.wx += dx
-            elif ch == 'F':
-                dy, dx = self.wy * amt, self.wx * amt
-                y += dy
-                x += dx
-            # print(f"{ch}{amt:<5}(x,y) = ({x},{y}),\tdir = {self.d},\t(wx,wy) = ({self.wx},{self.wy})")
-        return self.manhatDist(y, x)
+                wpt += mv
+            elif ch == 'R':
+                wpt *= mv
+            elif ch == 'L':
+                wpt /= mv
+        return self.manhatDist(pos)
 
-    def manhatDist(self, y: int, x: int) -> int:
-        return abs(y) + abs(x)
-
-    def shipOnly(self):
-        y: int = 0
-        x: int = 0
-        self.initDirection()
+    def shipOnly(self) -> int:
+        pos: complex = 0 + 0j
+        d: complex = 1 + 0j
         for ch, amt in self.moves:
-            if ch in {'R', 'L'}:
-                self.rotateDir(ch, amt)
-            elif ch in {'N', 'E', 'W', 'S', 'F'}:
-                dy, dx = self.move(ch, amt)
-                y += dy
-                x += dx
-        return self.manhatDist(y, x)
+            mv: complex = self.move(ch, amt)
+            if ch == 'F':
+                pos += mv * d
+            elif ch in {'N', 'E', 'W', 'S'}:
+                pos += mv
+            elif ch == 'R':
+                d *= mv
+            elif ch == 'L':
+                d /= mv
+        return self.manhatDist(pos)
 
-    def rotateDir(self, ch: str, amt: int):
-        assert ch in {'R', 'L'}
-        turn: int = int(amt / 90)
-        if ch == 'R':
-            self.d += turn
-        elif ch == 'L':
-            self.d -= turn
-        self.d %= 4
-
-    def move(self, ch: str, amt: int) -> Tuple[int, int]:
-        assert ch not in {'R', 'L'}
-        dy: int = 0
-        dx: int = 0
+    def move(self, ch: str, amt: int) -> complex:
         if ch == 'N':
-            dy, dx = dyx[N]
+            return -1j * amt
         elif ch == 'S':
-            dy, dx = dyx[S]
+            return 1j * amt
         elif ch == 'E':
-            dy, dx = dyx[E]
+            return amt
         elif ch == 'W':
-            dy, dx = dyx[W]
+            return -amt
+        elif ch in {'R', 'L'}:
+            # division causes float inaccuries
+            return 1j ** (amt // 90)
         elif ch == 'F':
-            dy, dx = dyx[self.d]
-        return dy * amt, dx * amt
+            return amt
+        raise Exception("invalid action")
+
+    def manhatDist(self, i: complex) -> int:
+        return int(abs(i.real) + abs(i.imag))
 
     def test(self):
         with open('12.test') as f:
@@ -125,6 +69,8 @@ class Solution:
         assert self.shipNWaypt() == 214 + 72
         with open('12.2.test') as f:
             self.parse(f.read())
+        assert self.shipOnly() == 11 + 1
         assert self.shipNWaypt() == 0
+
 
 s = Solution('12.in')
