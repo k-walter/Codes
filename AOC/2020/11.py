@@ -21,9 +21,10 @@ class Solution:
         return arr
 
     def sim(self) -> int:
-        self.q: List[int] = list(range(len(self.AL)))
+        initialAmt: int = len(self.AL)
+        self.q: List[int] = list(range(initialAmt))
         self.rnd: int = 0
-        self.use: List[int] = [self.rnd] * len(self.AL)
+        self.use: List[int] = [self.rnd] * initialAmt
         while len(self.q):
             self.rnd += 1
             changing = list(self.getChanging())
@@ -31,7 +32,6 @@ class Solution:
             for u in changing:
                 self.flip(u)
                 self.addNeighbor(u)
-            # break
         noOcc: int = sum(self.occ)
         return noOcc
 
@@ -138,7 +138,6 @@ class Solution:
         self.occ: List[bool] = [False] * noSeats
         self.deg: List[int] = [0] * noSeats
         self.AL: List[List[int]] = [[] for _ in range(noSeats)]
-        # create AL from ltr, utd, diagonal left, diagonal right
         self.initLTR(grid)
         self.initUTD(grid)
         self.initDiagLeft(grid)
