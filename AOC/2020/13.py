@@ -23,7 +23,6 @@ class Solution:
         return d - (n % d) if n % d else 0
 
     def earliestBus(self) -> int:
-
         def argFn(i: int) -> int:
             return mods[i]
         mods: List[int] = [self.calcWait(self.dep, b) for b in self.buses]
