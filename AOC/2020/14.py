@@ -61,8 +61,8 @@ class Solution:
                 ecks, one = self.parseQuatumMask(val)
             else:
                 addr = self.parseMem(key)
-                addrWithoutEcks = self.maskValue(ecks, one, addr)
-                idxs = self.quantumIter(ecks, addrWithoutEcks)
+                addr_without_ecks = self.maskValue(ecks, one, addr)
+                idxs = self.quantumIter(ecks, addr_without_ecks)
                 for idx in idxs:
                     ans[idx] = int(val)
         sum_changed = sum(ans.values())
