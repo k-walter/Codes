@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple, Generator, Iterable, Set, Optional
 
 
 class Solution:
-    def __init__(self, fname: str, test: bool = False):
+    def __init__(self, fname: str, test: bool = False) -> None:
         self.nearby: List[List[int]] = list()
         self.yours: List[List[int]] = list()
         self.rules: Dict[str, List[Tuple[int, int]]] = defaultdict(list)
@@ -16,12 +16,12 @@ class Solution:
         with open(fname) as f:
             self.parse(f.read())
 
-    def test(self):
+    def test(self) -> None:
         with open('16.test') as f:
             self.parse(f.read())
         assert self.sumInvalid() == 4 + 55 + 12
 
-    def parse(self, param: str):
+    def parse(self, param: str) -> None:
         rules, yours, nearby = param.split("\n\n")
         self.parseRules(rules)
         self.nearby = list(self.parseTickets(nearby))
@@ -33,7 +33,7 @@ class Solution:
             fields_list = list(map(int, fields))
             yield fields_list
 
-    def parseRules(self, rules: str):
+    def parseRules(self, rules: str) -> None:
         self.rules: Dict[str, List[Tuple[int, int]]] = defaultdict(list)
         for rule in rules.split('\n'):
             name, ranges = rule.split(': ')
@@ -91,24 +91,19 @@ class Solution:
 
     def getDomain(self, validTix: List[List[int]]) -> Generator[Set[str], None, None]:
         colVals: List[Optional[int]]
-        i = 0
         for colVals in zip_longest(*validTix):
-            # print(i)
             domain: Set[str] = set(self.rules.keys())
-            for r in tuple(domain):
-                rules = self.rules[r]
+            for r, rules in self.rules.items():
                 for v in colVals:
                     if v is None:
                         continue
                     isValidCol = self.checkRange(rules, v)
-                    if isValidCol:
-                        continue
-                    # print(v, r, rules)
-                    domain.remove(r)
-                    break
+                    if not isValidCol:
+                        domain.remove(r)
+                        break
             yield domain
 
-    def assignDomains(self, domains: List[Set[str]]):
+    def assignDomains(self, domains: List[Set[str]]) -> None:
         # similar to kahn's algo
         # extension could be backtracking / AC3
         adjList: Dict[str, List[int]] = defaultdict(list)
@@ -135,7 +130,7 @@ class Solution:
 
     def getDest(self, domains: List[Set[str]], yours) -> Generator[int, None, None]:
         for idx, domain in enumerate(domains):
-            assert len(domain) == 1, "Not properly assigned"
+            assert len(domain) == 1, "Domain not properly assigned"
             field = next(iter(domain))
             if field.startswith('departure'):
                 ticket = yours[idx]
