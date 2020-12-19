@@ -30,12 +30,13 @@ class Solution:
         assert self.evalNoPrecedence() == 13632
         assert self.evalAddPrecedence() == 23340
 
-    def parse(self, param: str):
+    def parse(self, param: str) -> None:
         lines = param.split('\n')
         self.eqns = list()
         for line in lines:
             chars = (ch for ch in list(line) if ch != ' ')
-            wrappedEqn = ['('] + [int(ch) if ch.isdigit() else ch for ch in chars] + [')']
+            numberOrOperator = (int(ch) if ch.isdigit() else ch for ch in chars)
+            wrappedEqn = ['('] + list(numberOrOperator) + [')']
             self.eqns.append(wrappedEqn)
 
     def evalNoPrecedence(self) -> int:
@@ -60,6 +61,7 @@ class Solution:
                 else:
                     raise Exception(stack, ch)
             ans += stack.pop()
+            assert len(stack) == 0
         return ans
 
     def eval(self, stack) -> None:
@@ -84,11 +86,10 @@ class Solution:
             left -= 1
         return left
 
-    def popBack(self, stack: List[Union[str, int]], n: int) -> None:
-        n = len(stack) - n
-        while n:
+    def popBack(self, stack: List[Union[str, int]], index: int) -> None:
+        noEle = len(stack) - index
+        for _ in range(noEle):
             stack.pop()
-            n -= 1
 
     def pushNo(self, stack: List[Union[str, int]], ch: int) -> None:
         isAddOp = self.addPrecedence and len(stack) and stack[-1] == "+"
