@@ -66,6 +66,7 @@ class Solution:
     def mapAllergenAndIngredient(self, allergen_to_ingredient: Dict[str, Set[str]], ingredient_to_allergen: Dict[str, Set[str]]):
         for food in self.foods:
             for allergen in food.allergens:
+                # created here to prevent reference to same set
                 ingredient_set = set(food.ingredients)
                 if allergen not in allergen_to_ingredient:
                     allergen_to_ingredient[allergen] = ingredient_set
