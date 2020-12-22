@@ -14,7 +14,6 @@ class GameState(NamedTuple):
 
 class Solution:
     def __init__(self, fname: str, test: bool = False):
-        self.n: int = 0
         self.p1: Deque[int] = deque()
         self.p2: Deque[int] = deque()
         if test:
@@ -28,11 +27,10 @@ class Solution:
 
     def parse(self) -> None:
         with open(self.fname) as f:
-            param = f.read()
-        p1, p2 = param.split('\n\n')
-        p1_cards = tuple(map(int, p1.split('\n')[1:]))
-        p2_cards = tuple(map(int, p2.split('\n')[1:]))
-        self.n = len(p1_cards) + len(p2_cards)
+            r = f.read()
+        p1, p2 = r.split('\n\n')
+        p1_cards = map(int, p1.split('\n')[1:])
+        p2_cards = map(int, p2.split('\n')[1:])
         self.p1 = deque(p1_cards)
         self.p2 = deque(p2_cards)
 
@@ -40,14 +38,21 @@ class Solution:
         self.parse()
         state = GameState(self.p1, self.p2)
         while not self.checkGameOver(state):
-            p1 = state.p1.popleft()
-            p2 = state.p2.popleft()
-            p1Wins = p1 > p2
-            if p1Wins:
-                state.p1.extend((p1, p2))
-            else:
-                state.p2.extend((p2, p1))
+            p1, p2 = self.drawCard(state)
+            self.iterateRound(p1, p2, state)
         return self.score(state.p1) + self.score(state.p2)
+
+    def drawCard(self, state: GameState) -> Tuple[int, int]:
+        p1 = state.p1.popleft()
+        p2 = state.p2.popleft()
+        return p1, p2
+
+    def iterateRound(self, p1: int, p2: int, state: GameState):
+        p1Wins = p1 > p2
+        if p1Wins:
+            state.p1.extend((p1, p2))
+        else:
+            state.p2.extend((p2, p1))
 
     def score(self, arr: Deque[int]) -> int:
         ans = 0
@@ -57,11 +62,12 @@ class Solution:
 
     def recurseCombat(self) -> int:
         self.parse()
-        winner = self.game(GameState(self.p1, self.p2, set()))
+        state = GameState(self.p1, self.p2, set())
+        winner = self.game(state)
         if winner == P1:
-            return self.score(self.p1)
+            return self.score(state.p1)
         elif winner == P2:
-            return self.score(self.p2)
+            return self.score(state.p2)
         raise Exception("Nobody won")
 
     def game(self, state: GameState) -> int:
@@ -69,20 +75,23 @@ class Solution:
         while self.checkGameOver(state) == DRAW:
             if self.checkSimilarRound(state):
                 return P1
-            p1 = state.p1.popleft()
-            p2 = state.p2.popleft()
+            p1, p2 = self.drawCard(state)
             isRecursive = p1 <= len(state.p1) and p2 <= len(state.p2)
             if isRecursive:
-                p1_slice = deque(islice(state.p1, p1))
-                p2_slice = deque(islice(state.p2, p2))
-                p1Wins = self.game(GameState(p1_slice, p2_slice, set())) == P1
+                self.recurseRound(p1, p2, state)
             else:
-                p1Wins = p1 > p2
-            if p1Wins:
-                state.p1.extend((p1, p2))
-            else:
-                state.p2.extend((p2, p1))
+                self.iterateRound(p1, p2, state)
         return self.checkGameOver(state)
+
+    def recurseRound(self, p1: int, p2: int, state):
+        p1_slice = deque(islice(state.p1, p1))
+        p2_slice = deque(islice(state.p2, p2))
+        p1Wins = self.game(GameState(p1_slice, p2_slice, set())) == P1
+        if p1Wins:
+            state.p1.extend((p1, p2))
+        else:
+            state.p2.extend((p2, p1))
+        return p1Wins
 
     def checkSimilarRound(self, state: GameState) -> bool:
         p1_tuple = tuple(chain((0,), state.p1))
