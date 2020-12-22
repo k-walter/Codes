@@ -91,11 +91,10 @@ class Solution:
             state.p1.extend((p1, p2))
         else:
             state.p2.extend((p2, p1))
-        return p1Wins
 
     def checkSimilarRound(self, state: GameState) -> bool:
-        p1_tuple = tuple(chain((0,), state.p1))
-        p2_tuple = tuple(chain((1,), state.p2))
+        p1_tuple = tuple(chain((P1,), state.p1))
+        p2_tuple = tuple(chain((P2,), state.p2))
         p1_wins = p1_tuple in state.vis or p2_tuple in state.vis
         if p1_wins:
             return True
