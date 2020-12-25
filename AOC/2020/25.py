@@ -16,19 +16,28 @@ class Solution:
         assert self.crack() == 14897079
 
     def crack(self) -> int:
+        # Solution 1: O(c + lgd)
         card, door = self.public_keys
-        card_round = self.findRound(card)
-        encryption_key = self.pow(door, card_round)
+        card_round = self.findRound(card)   # O(c)
+        encryption_key = self.pow(door, card_round)   # O(lgd)
+        return encryption_key
+
+    def crack_slower(self) -> int:
+        # Solution 2: O(c + d)
+        card, door = self.public_keys
+        card_round = self.findRound(card)  # O(c)
+        door_round = self.findRound(door)  # O(d)
+        encryption_key = self.pow(self.BASE, card_round * door_round)  # O(lgd + lgc)
         return encryption_key
 
     def findRound(self, public: int) -> int:
-        round: int = 1
-        while self.pow(self.BASE, round) != public:
-            round += 1
-        return round
+            rnds: int = 1
+            while self.pow(self.BASE, rnds) != public:
+                rnds += 1
+            return rnds
 
     @lru_cache(maxsize=None)
-    def pow(self, base, exp) -> int:
+    def pow(self, base: int, exp: int) -> int:
         if exp == 1:
             return base % self.MOD
         half = self.pow(base, (exp >> 1))
