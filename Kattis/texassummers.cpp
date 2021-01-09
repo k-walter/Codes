@@ -1,53 +1,80 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int INF = 1e9;
-using ii = pair<int,int>;
+typedef pair<int,int> ii;
+typedef long long ll;
+typedef tuple<int,int,int> iii; // dist, x, y
 
-int square(const int &a) { return a*a; }
-int weight(const ii &a, const ii &b) {
-	return square(a.first-b.first) + square(a.second-b.second);
-}
-
-int n;
-vector<int> parent;
-void rec(const int &i) {
-	if (parent[i] == n-2) return;
-	rec(parent[i]);
-	cout << parent[i] << "\n";
+long long sq(long long val) {
+	return val * val;
 }
 
 int main() {
 	ios::sync_with_stdio(false); cin.tie(NULL);
-	// freopen("texassummers.in", "r", stdin);
+	freopen("texassummers.in", "r", stdin);
 
-	cin>>n; n+=2;
-	vector<ii> pts;
-	int x,y;
-	for (int i = 0; i < n; ++i) {
-		cin>>x>>y;
-		pts.emplace_back(x,y);
+	int n; cin>> n;
+	// read in shady spots
+	vector<ii> vtx;
+	while (n--) {
+		int x, y; cin >> x >> y;
+		vtx.emplace_back(x, y);
 	}
-
-	parent.resize(n);
-	vector<int> dist(n,INF); dist[n-2] = 0;
-	set<ii>pq; pq.emplace(0, n-2); // lazy delete gets too slow
+	// read in dorm, class
+	ii s; auto &[sx,sy] = s;
+	cin >> sx >> sy;
+	ii t; auto &[tx,ty] = t;
+	cin >> tx >> ty;
+	vtx.emplace_back(sy, sx);
+	// shortest path by sweat
+	vector<ll> dist(vtx.size(), 1e18);
+	vector<int> prev(vtx.size());
+	priority_queue<ii, vector<ii>, greater<ii>> pq;
+	pq.emplace(0, -1); // dist, index
 	while (pq.size()) {
-		auto it = pq.begin();
-		auto [d,u] = *it; pq.erase(it);
-		if (u == n-1) break;
-		for (int v = 0; v < n; ++v) {
-			if (d + weight(pts[u],pts[v]) >= dist[v] || v == u) continue;
-			pq.erase({dist[v], v});
-			// dist[v] = d + weight(pts[u],pts[v]);
-			dist[v] = d + am[u][v];
-			parent[v] = u;
-			pq.emplace(dist[v], v);
+		auto [d, u] = pq.top(); pq.pop();
+		if (u != -1 && dist[u] < d) continue;
+		if (u == vtx.size() - 1) {
+			break;
+		}
+		int ux, uy;
+		if (u == -1) {
+			ux = tx; uy = ty;
+		} else {
+			auto &[x, y] = vtx[u];
+			ux = x; uy = y;
+		}
+		for (int v = 0; v < vtx.size(); ++v) {
+			if (v == u) continue;
+			auto &[vx, vy] = vtx[v];
+			ll dd = d + sq(vx - ux) + sq(vy - uy);
+			if (dd >= dist[v]) continue;
+			prev[v] = u;
+			dist[v] = dd;
+			pq.emplace(dd, v);
 		}
 	}
-
-	if (parent[n-1] == n-2) cout << '-';
-	else rec(n-1);
+	// if no shade, print '-'
+	int cur = vtx.size() - 1;
+	if (prev[cur] == -1) { cout << "-"; return 0; }
+	// path from dorm to class
+	while (prev[cur] != -1) {
+		cur = prev[cur];
+		cout << cur << "\n";
+	}
 
 	return 0;
 }
+
+/*
+x___
+___x
+
+ux, uy
+vx, vy
+
+ed = ((ux - vx) ^2 + (uy - vy) ^2)^.5
+d = ed^2
+
+
+*/
