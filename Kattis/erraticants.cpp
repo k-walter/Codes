@@ -1,56 +1,70 @@
 #include <bits/stdc++.h>
 using namespace std;
-typedef tuple<bool,bool,bool,bool> udlr;
-typedef vector<udlr> vi;
+
 typedef pair<int,int> yx;
 
-int dy[] = {-1, 1, 0, 0};
-int dx[] = {0, 0, -1, 1};
+int al[200][200];
+int dy[] = {-1, 1, 0, 0}, dx[] = {0, 0, -1, 1}; // up 0, down 1, left 2, right 3
+
+inline void bfs(int ty, int tx) {
+	if (ty == 100 && tx == 100) {
+		cout << "0\n";
+		return;
+	}
+
+	int ans = 0, n;
+	al[ty][tx] |= (1 << 4);
+	queue<yx> q; q.emplace(ty, tx);
+	while (q.size()) {
+		n = q.size();
+		// cout << "dist " << ans << "\n";
+		++ans;
+		while (n--) {
+			auto &[yy,xx] = q.front();
+			// cout << "at " << yy << " " << xx << "\n";
+			auto &dir = al[yy][xx];
+			for (int i = 0; i < 4; ++i) {
+				if (!(dir & (1 << i))) continue;
+				const int &y = yy+dy[i], &x = xx+dx[i];
+				if (y==100 && x==100) {
+					cout << ans << "\n";
+					return;
+				}
+				if (al[y][x] & (1 << 4)) continue;
+				al[y][x] |= (1 << 4);
+				q.emplace(y, x);
+			}
+			q.pop();
+		}
+	}
+}
 
 int main() {
 	ios::sync_with_stdio(false); cin.tie(NULL);
-	freopen("erraticants.in", "r", stdin);
+	// freopen("erraticants.in", "r", stdin);
 
-	int n; cin >> n;
-	while (n--) {
-		int m; cin >> m;
-		vector<vi> g(200, vb(200));
-		// y * x --> u/d/l/r , (y,x), (y,x)
-		int y = 100, x = 100;
-		while (m--) {
-			char c; cin >> c;
-			auto &[u,d,l,r] = g[y][x];
+	int tc, n, dir; cin >> tc;
+	char c;
+	int y, x, yy, xx;
+	while (tc--) {
+		cin >> n;
+		memset(al, 0, sizeof al);
+		y = x = 100;
+		while (n--) {
+			cin >> c;
+			yy = y; xx = x;
 			switch (c) {
-				case 'S': d=1; ++y; break;
-				case 'N': u=1; --y; break;
-				case 'E': r=1; ++x; break;
-				case 'W': l=1; --x; break;
+				case 'N': dir=0; --y; break;
+				case 'S': dir=1; ++y; break;
+				case 'W': dir=2; --x; break;
+				case 'E': dir=3; ++x; break;
 			}
+			al[yy][xx] |= (1 << dir);
+			al[y][x] |= (1 << (dir ^ 1));
+			yy = y; xx = x;
 		}
-		int ty = y, tx = x;
-		queue<yx> q; q.push(100, 100);
-		vector<vector<bool>> vis(200, vector<bool>(200, 0));
-		vis[100][100] = 1;
-		int d = 0;
-		while (q.size()) {
-			int size = q.size();
-			while (size--) {
-				auto &[yy, xx] = q.front();
-
-				for (int i = 0; i < 4; ++i) {
-					get<i>(q.front())
-				}
-				q.pop();
-			}
-		}
+		bfs(y, x);
 	}
 
 	return 0;
 }
-
-/*
-
-s   x x
-x x x x
-    t
-*/
