@@ -1,0 +1,29 @@
+3
+E one
+E two
+S 2 two !one
+
+11
+S 1 !something
+E one
+E two
+E three
+E four
+E five
+S 3 three !four one
+D 1
+S 3 three !four one
+D 1
+S 3 three !four one
+
+10
+E business_as_usual
+E bobby_dies
+S 1 bobby_died
+E stuff_happens
+E jr_does_bad_things
+S 2 !bobby_dies business_as_usual
+E it_goes_on_and_on
+D 4
+S 1 !bobby_dies
+S 2 !bobby_dies it_goes_on_and_on
